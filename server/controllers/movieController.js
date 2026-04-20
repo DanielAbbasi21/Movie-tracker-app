@@ -22,10 +22,16 @@ const createMovie = async (req, res) => {
   }
 };
 
-// GET - get all movies
+// GET - get all movies/watched movies and not watched
 const getMovies = async (req, res) => {
   try {
-    const movies = await Movie.find();
+    const filter = {};
+
+    if (req.query.watched !== undefined) {
+      filter.watched = req.query.watched === "true";
+    }
+
+    const movies = await Movie.find(filter);
 
     res.status(200).json(movies);
   } catch (error) {
@@ -71,6 +77,8 @@ const deleteMovie = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 module.exports = {
   createMovie,
