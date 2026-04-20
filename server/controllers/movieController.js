@@ -6,6 +6,18 @@ const createMovie = async (req, res) => {
   try {
     const { title, genre, rating, watched, watchedDate } = req.body;
 
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    if (rating !== undefined && (rating < 1 || rating > 10)) {
+      return res.status(400).json({ error: "Rating must be between 1 and 10" });
+    }
+
+    if (watched === false && watchedDate) {
+      return res.status(400).json({ error: "Cannot set watchedDate if movie is not watched" });
+    }
+
     const movie = new Movie({
       title,
       genre,
@@ -42,6 +54,16 @@ const getMovies = async (req, res) => {
 //PUT - update movie
 const updateMovie = async (req, res) => {
   try {
+    const { rating, watched, watchedDate } = req.body;
+
+    if (rating !== undefined && (rating < 1 || rating > 10)) {
+      return res.status(400).json({ error: "Rating must be between 1 and 10" });
+    }
+
+    if (watched === false && watchedDate) {
+      return res.status(400).json({ error: "Cannot set watchedDate if movie is not watched" });
+    }
+
     const updatedMovie = await Movie.findByIdAndUpdate(
       req.params.id,
       req.body,
