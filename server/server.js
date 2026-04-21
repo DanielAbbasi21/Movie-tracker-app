@@ -3,12 +3,14 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 const movieRoutes = require("./routes/movieRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 app.use(express.json());
 
 
 app.use("/api/movies", movieRoutes);
+app.use("/api/users", userRoutes);
 
 
 app.get("/", (req, res) => {
