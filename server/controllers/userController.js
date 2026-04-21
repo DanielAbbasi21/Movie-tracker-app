@@ -50,5 +50,31 @@ const getUserById = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
 
-module.exports = { createUser, getUsers, getUserById };
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,          
+        runValidators: true  
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+module.exports = { createUser, getUsers, getUserById, updateUser };
