@@ -121,5 +121,24 @@ const updateReview = async (req, res) => {
   }
 };
 
+const deleteReview = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid review ID" });
+    }
 
-module.exports = { createReview, getReviews, getReviewById, updateReview };
+    const deletedReview = await Review.findByIdAndDelete(req.params.id);
+
+    if (!deletedReview) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+
+    res.status(200).json({ message: "Review deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+module.exports = { createReview, getReviews, getReviewById, updateReview, deleteReview };
