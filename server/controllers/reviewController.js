@@ -37,4 +37,34 @@ const createReview = async (req, res) => {
   }
 };
 
-module.exports = { createReview };
+
+const getReviews = async (req, res) => {
+  try {
+    const filter = {};
+
+    if (req.query.movieId) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.movieId)) {
+        return res.status(400).json({ error: "Invalid movie ID" });
+      }
+      filter.movieId = req.query.movieId;
+    }
+
+    if (req.query.userId) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      filter.userId = req.query.userId;
+    }
+
+    const reviews = await Review.find(filter)
+      .populate("userId", "username email")
+      .populate("movieId", "title genre");
+
+    res.status(200).json(reviews);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { createReview, getReviews };
