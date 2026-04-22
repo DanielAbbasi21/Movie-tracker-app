@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const movieRoutes = require("./routes/movieRoutes");
 const userRoutes = require("./routes/userRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 app.use(express.json());
@@ -11,6 +12,7 @@ app.use(express.json());
 
 app.use("/api/movies", movieRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 
 app.get("/", (req, res) => {
