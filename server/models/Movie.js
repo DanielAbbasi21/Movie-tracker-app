@@ -15,15 +15,7 @@ const movieSchema = new mongoose.Schema({
     min: 1,
     max: 10
   },
-
-  watched: {
-    type: Boolean,
-    default: false
-  },
-
-  watchedDate: {
-    type: Date
-  } 
+  
 });
 
 module.exports = mongoose.model("Movie", movieSchema);
