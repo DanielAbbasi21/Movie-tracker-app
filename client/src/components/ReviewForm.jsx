@@ -8,8 +8,8 @@ function ReviewForm({ onAdd }) {
   const [movieId, setMovieId] = useState("");
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
+  const [error, setError] = useState("");
 
-  //GET users + movies
   useEffect(() => {
     fetch("http://localhost:5000/api/users")
       .then(res => res.json())
@@ -23,6 +23,13 @@ function ReviewForm({ onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (rating < 1 || rating > 10) {
+      setError("Rating must be between 1 and 10");
+      return;
+    }
+
+    setError("");
+
     const newReview = {
       userId,
       movieId,
@@ -30,7 +37,7 @@ function ReviewForm({ onAdd }) {
       comment,
     };
 
-    const res = await fetch("http://localhost:5000/api/reviews", {
+    await fetch("http://localhost:5000/api/reviews", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +45,6 @@ function ReviewForm({ onAdd }) {
       body: JSON.stringify(newReview),
     });
 
-    const data = await res.json();
     onAdd();
 
     setUserId("");
@@ -50,6 +56,8 @@ function ReviewForm({ onAdd }) {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Add Review</h2>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <select value={userId} onChange={(e) => setUserId(e.target.value)}>
         <option value="">Select User</option>

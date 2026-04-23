@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ReviewList from "./components/ReviewList";
 import ReviewForm from "./components/ReviewForm";
+import "./App.css";
 
 function App() {
   const [reviews, setReviews] = useState([]);
@@ -45,48 +46,91 @@ function App() {
 
   const hideReviews = () => {
     setShowReviews(false);
-    setReviews([]);
+  };
+
+  const deleteReview = async (id) => {
+    await fetch(`http://localhost:5000/api/reviews/${id}`, {
+      method: "DELETE",
+    });
+
+    setReviews(prev => prev.filter(r => r._id !== id));
+  };
+
+  const updateReview = async (id, updatedData) => {
+    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    const data = await res.json();
+
+    setReviews(prev =>
+      prev.map(r => (r._id === id ? data : r))
+    );
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Reviews</h1>
 
-      <div>
-        <select onChange={(e) => setSelectedUser(e.target.value)}>
-          <option value="">Select User</option>
-          {users.map(user => (
-            <option key={user._id} value={user._id}>
-              {user.username}
-            </option>
-          ))}
-        </select>
+      <div className="section">
+        <h2>Filter Reviews</h2>
 
-        <button onClick={fetchByUser}>
-          Show User Reviews
-        </button>
+        <div>
+          <select onChange={(e) => setSelectedUser(e.target.value)}>
+            <option value="">Select User</option>
+            {users.map(user => (
+              <option key={user._id} value={user._id}>
+                {user.username}
+              </option>
+            ))}
+          </select>
 
-        <select onChange={(e) => setSelectedMovie(e.target.value)}>
-          <option value="">Select Movie</option>
-          {movies.map(movie => (
-            <option key={movie._id} value={movie._id}>
-              {movie.title}
-            </option>
-          ))}
-        </select>
+          <button onClick={fetchByUser}>
+            Show User Reviews
+          </button>
 
-        <button onClick={fetchByMovie}>
-          Show Movie Reviews
-        </button>
+          <button onClick={hideReviews} className="danger">
+            Hide
+          </button>
+        </div>
 
-        <button onClick={hideReviews}>
-          Hide Reviews
-        </button>
+        <br />
+
+        <div>
+          <select onChange={(e) => setSelectedMovie(e.target.value)}>
+            <option value="">Select Movie</option>
+            {movies.map(movie => (
+              <option key={movie._id} value={movie._id}>
+                {movie.title}
+              </option>
+            ))}
+          </select>
+
+          <button onClick={fetchByMovie}>
+            Show Movie Reviews
+          </button>
+
+          <button onClick={hideReviews} className="danger">
+            Hide
+          </button>
+        </div>
       </div>
 
-      <ReviewForm onAdd={hideReviews} />
+      <div className="section">
+        <ReviewForm onAdd={fetchByUser} />
+      </div>
 
-      {showReviews && <ReviewList reviews={reviews} />}
+      {showReviews && (
+        <ReviewList
+          reviews={reviews}
+          onDelete={deleteReview}
+          onUpdate={updateReview}
+        />
+      )}
     </div>
   );
 }

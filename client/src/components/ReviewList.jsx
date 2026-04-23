@@ -1,10 +1,14 @@
 import ReviewItem from "./ReviewItem";
 
-function ReviewList({ reviews }) {
+function ReviewList({ reviews, onDelete }) {
   return (
-    <div>
+    <div className="review-list">
       {reviews.map((review) => (
-        <ReviewItem key={review._id} review={review} />
+        <ReviewItem
+          key={review._id}
+          review={review}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );
