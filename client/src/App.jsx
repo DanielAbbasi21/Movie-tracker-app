@@ -12,6 +12,9 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState("");
   const [showReviews, setShowReviews] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     fetch("http://localhost:5000/api/users")
       .then(res => res.json())
@@ -23,25 +26,41 @@ function App() {
   }, []);
 
   const fetchByUser = () => {
-    if (!selectedUser) return;
+  if (!selectedUser) return;
 
-    fetch(`http://localhost:5000/api/reviews?userId=${selectedUser}`)
-      .then(res => res.json())
-      .then(data => {
-        setReviews(data);
-        setShowReviews(true);
-      });
+  setLoading(true);
+  setError("");
+
+  fetch(`http://localhost:5000/api/reviews?userId=${selectedUser}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch user reviews");
+      return res.json();
+    })
+    .then(data => {
+      setReviews(data);
+      setShowReviews(true);
+    })
+    .catch(err => setError(err.message))
+    .finally(() => setLoading(false));
   };
 
   const fetchByMovie = () => {
-    if (!selectedMovie) return;
+  if (!selectedMovie) return;
 
-    fetch(`http://localhost:5000/api/reviews?movieId=${selectedMovie}`)
-      .then(res => res.json())
-      .then(data => {
-        setReviews(data);
-        setShowReviews(true);
-      });
+  setLoading(true);
+  setError("");
+
+  fetch(`http://localhost:5000/api/reviews?movieId=${selectedMovie}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch movie reviews");
+      return res.json();
+    })
+    .then(data => {
+      setReviews(data);
+      setShowReviews(true);
+    })
+    .catch(err => setError(err.message))
+    .finally(() => setLoading(false));
   };
 
   const hideReviews = () => {
@@ -49,14 +68,25 @@ function App() {
   };
 
   const deleteReview = async (id) => {
-    await fetch(`http://localhost:5000/api/reviews/${id}`, {
+  try {
+    setError("");
+
+    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
       method: "DELETE",
     });
 
-    setReviews(prev => prev.filter(r => r._id !== id));
+    if (!res.ok) throw new Error("Failed to delete review");
+
+      setReviews(prev => prev.filter(r => r._id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const updateReview = async (id, updatedData) => {
+  try {
+    setError("");
+
     const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
       method: "PUT",
       headers: {
@@ -65,12 +95,17 @@ function App() {
       body: JSON.stringify(updatedData),
     });
 
+    if (!res.ok) throw new Error("Failed to update review");
+
     const data = await res.json();
 
     setReviews(prev =>
       prev.map(r => (r._id === id ? data : r))
     );
-  };
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   return (
     <div className="container">
@@ -123,6 +158,9 @@ function App() {
       <div className="section">
         <ReviewForm onAdd={fetchByUser} />
       </div>
+
+      {loading && <p className="loading">Loading...</p>}
+      {error && <p className="error">{error}</p>}
 
       {showReviews && (
         <ReviewList

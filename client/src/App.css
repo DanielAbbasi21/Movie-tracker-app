@@ -40,3 +40,14 @@ button {
 button.danger {
   background: #e74c3c;
 }
+
+.loading {
+  text-align: center;
+  color: #555;
+}
+
+.error {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
