@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReviewList from "./components/ReviewList";
 
 function App() {
   const [reviews, setReviews] = useState([]);
@@ -12,16 +13,7 @@ function App() {
   return (
     <div>
       <h1>Reviews</h1>
-
-      {reviews.map((review) => (
-        <div key={review._id}>
-          <h3>{review.movieId.title}</h3>
-          <p>User: {review.userId.username}</p>
-          <p>Rating: {review.rating}</p>
-          <p>{review.comment}</p>
-          <hr />
-        </div>
-      ))}
+      <ReviewList reviews={reviews} />
     </div>
   );
 }
