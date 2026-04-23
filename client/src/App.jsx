@@ -25,6 +25,20 @@ function App() {
       .then(data => setMovies(data));
   }, []);
 
+  useEffect(() => {
+  if (!showReviews) return;
+
+  const interval = setInterval(() => {
+    if (selectedUser) {
+      fetchByUser();
+    } else if (selectedMovie) {
+      fetchByMovie();
+    }
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, [showReviews, selectedUser, selectedMovie]);
+
   const fetchByUser = () => {
   if (!selectedUser) return;
 
@@ -38,7 +52,7 @@ function App() {
     })
     .then(data => {
       setReviews(data);
-      setShowReviews(true);
+      setShowReviews(prev => prev || true);
     })
     .catch(err => setError(err.message))
     .finally(() => setLoading(false));
@@ -57,7 +71,7 @@ function App() {
     })
     .then(data => {
       setReviews(data);
-      setShowReviews(true);
+      setShowReviews(prev => prev || true);
     })
     .catch(err => setError(err.message))
     .finally(() => setLoading(false));
