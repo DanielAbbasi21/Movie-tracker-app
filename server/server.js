@@ -1,5 +1,5 @@
 const express = require("express");
-require("dotenv").config();
+require("dotenv").config({ path: "./server/.env" });
 const mongoose = require("mongoose");
 
 const movieRoutes = require("./routes/movieRoutes");
