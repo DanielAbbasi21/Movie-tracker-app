@@ -5,6 +5,14 @@ A fullstack Movie Tracker application focused on managing movie reviews. The fro
 ## Problem
 This app solves the everyday problem of remembering and organizing movie experiences by allowing users to store, manage, and filter reviews by user or movie.
 
+## How It Works
+
+- Users and movies are created via API requests (e.g. using Postman).
+- In the frontend, you can select a user or a movie from dropdown menus.
+- The app will display reviews based on your selection.
+- You can create new reviews through the interface.
+- When viewing user-specific reviews, you can update or delete them.
+- When viewing movie reviews, they are displayed as read-only.
 
 ## Setup (Run in under 5 minutes)
 
