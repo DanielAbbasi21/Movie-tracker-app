@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function ReviewItem({ review, onDelete, onUpdate }) {
+function ReviewItem({ review, onDelete, onUpdate, showActions }) {
   const [isEditing, setIsEditing] = useState(false);
   const [rating, setRating] = useState(review.rating);
   const [comment, setComment] = useState(review.comment);
@@ -24,42 +24,52 @@ function ReviewItem({ review, onDelete, onUpdate }) {
       <h3>{review.movieId?.title}</h3>
 
       <p><strong>User:</strong> {review.userId?.username}</p>
+      {showActions ? (
+        isEditing ? (
+          <>
+            <input
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+            />
+            <input
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
 
-      {isEditing ? (
-        <>
-          <input
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-          />
-          <input
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
+            <button onClick={handleUpdate}>Save</button>
+          </>
+        ) : (
+          <>
+            <p><strong>Rating:</strong> {review.rating}</p>
+            <p>{review.comment}</p>
 
-          <button onClick={handleUpdate}>Save</button>
-        </>
+            <button onClick={() => setIsEditing(true)}>
+              Update
+            </button>
+          </>
+        )
       ) : (
         <>
           <p><strong>Rating:</strong> {review.rating}</p>
           <p>{review.comment}</p>
-
-          <button onClick={() => setIsEditing(true)}>
-            Update
-          </button>
         </>
       )}
 
-      <button
-        onClick={() => {
-          if (window.confirm("Are you sure?")) {
-            onDelete(review._id);
-          }
-        }}
-      >
-        Delete
-      </button>
+      {showActions && (
+        <button
+          onClick={() => {
+            if (window.confirm("Are you sure?")) {
+              onDelete(review._id);
+            }
+          }}
+        >
+          Delete
+        </button>
+      )}
     </div>
   );
 }
 
 export default ReviewItem;
+
+      

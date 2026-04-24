@@ -1,6 +1,6 @@
 import ReviewItem from "./ReviewItem";
 
-function ReviewList({ reviews, onDelete, onUpdate }) {
+function ReviewList({ reviews, onDelete, onUpdate, showActions }) {
   return (
     <div className="review-list">
       {reviews.map((review) => (
@@ -9,6 +9,7 @@ function ReviewList({ reviews, onDelete, onUpdate }) {
           review={review}
           onDelete={onDelete}
           onUpdate={onUpdate}
+          showActions={showActions}
         />
       ))}
     </div>

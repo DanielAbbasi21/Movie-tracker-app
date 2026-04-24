@@ -14,6 +14,7 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:5000/api/users")
@@ -42,6 +43,8 @@ function App() {
   const fetchByUser = () => {
   if (!selectedUser) return;
 
+  setViewMode("user");
+
   setLoading(true);
   setError("");
 
@@ -60,6 +63,9 @@ function App() {
 
   const fetchByMovie = () => {
   if (!selectedMovie) return;
+
+  setViewMode("movie");
+
 
   setLoading(true);
   setError("");
@@ -181,6 +187,7 @@ function App() {
           reviews={reviews}
           onDelete={deleteReview}
           onUpdate={updateReview}
+          showActions={viewMode == "user"}
         />
       )}
     </div>
