@@ -104,11 +104,10 @@ const updateReview = async (req, res) => {
     const updatedReview = await Review.findByIdAndUpdate(
       req.params.id,
       req.body,
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+      { new: true, runValidators: true }
+    )
+      .populate("userId", "username email")
+      .populate("movieId", "title genre");
 
     if (!updatedReview) {
       return res.status(404).json({ error: "Review not found" });
@@ -117,7 +116,7 @@ const updateReview = async (req, res) => {
     res.status(200).json(updatedReview);
 
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

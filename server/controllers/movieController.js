@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // POST - create movie
 const createMovie = async (req, res) => {
   try {
-    const { title, genre, rating, watched, watchedDate } = req.body;
+    const { title, genre, rating } = req.body;
 
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
@@ -14,16 +14,10 @@ const createMovie = async (req, res) => {
       return res.status(400).json({ error: "Rating must be between 1 and 10" });
     }
 
-    if (watched === false && watchedDate) {
-      return res.status(400).json({ error: "Cannot set watchedDate if movie is not watched" });
-    }
-
     const movie = new Movie({
       title,
       genre,
       rating,
-      watched,
-      watchedDate
     });
 
     const savedMovie = await movie.save();
@@ -34,17 +28,10 @@ const createMovie = async (req, res) => {
   }
 };
 
-// GET - get all movies/watched movies and not watched
+// GET - get all movies
 const getMovies = async (req, res) => {
   try {
-    const filter = {};
-
-    if (req.query.watched !== undefined) {
-      filter.watched = req.query.watched === "true";
-    }
-
-    const movies = await Movie.find(filter);
-
+    const movies = await Movie.find();
     res.status(200).json(movies);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -73,14 +60,10 @@ const getMovieById = async (req, res) => {
 //PUT - update movie
 const updateMovie = async (req, res) => {
   try {
-    const { rating, watched, watchedDate } = req.body;
+    const { rating } = req.body;
 
     if (rating !== undefined && (rating < 1 || rating > 10)) {
       return res.status(400).json({ error: "Rating must be between 1 and 10" });
-    }
-
-    if (watched === false && watchedDate) {
-      return res.status(400).json({ error: "Cannot set watchedDate if movie is not watched" });
     }
 
     const updatedMovie = await Movie.findByIdAndUpdate(
