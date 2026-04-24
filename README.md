@@ -65,6 +65,9 @@ http://localhost:5000/api
 Movies and users are created via API requests (e.g. using Postman).
 
 ### User Endpoints
+#### Get All Users
+GET /users
+
 #### Create User
 POST /users
 ```json
@@ -92,6 +95,10 @@ DELETE /users/:id
 -----------------------------------------------------------------------------------
 
 ### Movie Endpoints
+
+#### Get All Movies
+GET /movies
+
 
 #### Create Movie
 POST /movies
