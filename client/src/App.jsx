@@ -129,7 +129,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Reviews</h1>
+      <h1>Movie Reviews 🍿</h1>
 
       <div className="section">
         <h2>Filter Reviews</h2>
