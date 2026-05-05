@@ -11,11 +11,11 @@ function ReviewForm({ onAdd }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users")
+    fetch("https://movie-tracker-app-backend-2qjg.onrender.com/api/users")
       .then(res => res.json())
       .then(data => setUsers(data));
 
-    fetch("http://localhost:5000/api/movies")
+    fetch("https://movie-tracker-app-backend-2qjg.onrender.com/api/movies")
       .then(res => res.json())
       .then(data => setMovies(data));
   }, []);
@@ -37,7 +37,7 @@ function ReviewForm({ onAdd }) {
       comment,
     };
 
-    await fetch("http://localhost:5000/api/reviews", {
+    await fetch("https://movie-tracker-app-backend-2qjg.onrender.com/api/reviews", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
