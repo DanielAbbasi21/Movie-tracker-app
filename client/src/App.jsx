@@ -3,6 +3,8 @@ import ReviewList from "./components/ReviewList";
 import ReviewForm from "./components/ReviewForm";
 import "./App.css";
 
+const API_URL = "https://movie-tracker-app-backend-2qjg.onrender.com";
+
 function App() {
   const [reviews, setReviews] = useState([]);
   const [users, setUsers] = useState([]);
@@ -17,70 +19,102 @@ function App() {
   const [viewMode, setViewMode] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users")
-      .then(res => res.json())
-      .then(data => setUsers(data));
+    const fetchInitialData = async () => {
+      try {
+        setError("");
 
-    fetch("http://localhost:5000/api/movies")
-      .then(res => res.json())
-      .then(data => setMovies(data));
+        const usersRes = await fetch(`${API_URL}/api/users`);
+        if (!usersRes.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const usersData = await usersRes.json();
+        setUsers(Array.isArray(usersData) ? usersData : usersData.users || []);
+
+        const moviesRes = await fetch(`${API_URL}/api/movies`);
+        if (!moviesRes.ok) {
+          throw new Error("Failed to fetch movies");
+        }
+
+        const moviesData = await moviesRes.json();
+        setMovies(Array.isArray(moviesData) ? moviesData : moviesData.movies || []);
+      } catch (err) {
+        console.error("Initial data fetch error:", err);
+        setError(err.message);
+      }
+    };
+
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
-  if (!showReviews) return;
+    if (!showReviews) return;
 
-  const interval = setInterval(() => {
-    if (selectedUser) {
-      fetchByUser();
-    } else if (selectedMovie) {
-      fetchByMovie();
+    const interval = setInterval(() => {
+      if (selectedUser) {
+        fetchByUser();
+      } else if (selectedMovie) {
+        fetchByMovie();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [showReviews, selectedUser, selectedMovie]);
+
+  const fetchByUser = async () => {
+    if (!selectedUser) {
+      setError("Please select a user");
+      return;
     }
-  }, 5000);
 
-  return () => clearInterval(interval);
-}, [showReviews, selectedUser, selectedMovie]);
+    try {
+      setViewMode("user");
+      setLoading(true);
+      setError("");
 
-  const fetchByUser = () => {
-  if (!selectedUser) return;
+      const res = await fetch(`${API_URL}/api/reviews?userId=${selectedUser}`);
 
-  setViewMode("user");
+      if (!res.ok) {
+        throw new Error("Failed to fetch user reviews");
+      }
 
-  setLoading(true);
-  setError("");
-
-  fetch(`http://localhost:5000/api/reviews?userId=${selectedUser}`)
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to fetch user reviews");
-      return res.json();
-    })
-    .then(data => {
-      setReviews(data);
-      setShowReviews(prev => prev || true);
-    })
-    .catch(err => setError(err.message))
-    .finally(() => setLoading(false));
+      const data = await res.json();
+      setReviews(Array.isArray(data) ? data : data.reviews || []);
+      setShowReviews(true);
+    } catch (err) {
+      console.error("Fetch user reviews error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fetchByMovie = () => {
-  if (!selectedMovie) return;
+  const fetchByMovie = async () => {
+    if (!selectedMovie) {
+      setError("Please select a movie");
+      return;
+    }
 
-  setViewMode("movie");
+    try {
+      setViewMode("movie");
+      setLoading(true);
+      setError("");
 
+      const res = await fetch(`${API_URL}/api/reviews?movieId=${selectedMovie}`);
 
-  setLoading(true);
-  setError("");
+      if (!res.ok) {
+        throw new Error("Failed to fetch movie reviews");
+      }
 
-  fetch(`http://localhost:5000/api/reviews?movieId=${selectedMovie}`)
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to fetch movie reviews");
-      return res.json();
-    })
-    .then(data => {
-      setReviews(data);
-      setShowReviews(prev => prev || true);
-    })
-    .catch(err => setError(err.message))
-    .finally(() => setLoading(false));
+      const data = await res.json();
+      setReviews(Array.isArray(data) ? data : data.reviews || []);
+      setShowReviews(true);
+    } catch (err) {
+      console.error("Fetch movie reviews error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const hideReviews = () => {
@@ -88,44 +122,50 @@ function App() {
   };
 
   const deleteReview = async (id) => {
-  try {
-    setError("");
+    try {
+      setError("");
 
-    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
-      method: "DELETE",
-    });
+      const res = await fetch(`${API_URL}/api/reviews/${id}`, {
+        method: "DELETE",
+      });
 
-    if (!res.ok) throw new Error("Failed to delete review");
+      if (!res.ok) {
+        throw new Error("Failed to delete review");
+      }
 
-      setReviews(prev => prev.filter(r => r._id !== id));
+      setReviews((prev) => prev.filter((review) => review._id !== id));
     } catch (err) {
+      console.error("Delete review error:", err);
       setError(err.message);
     }
   };
 
   const updateReview = async (id, updatedData) => {
-  try {
-    setError("");
+    try {
+      setError("");
 
-    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedData),
-    });
+      const res = await fetch(`${API_URL}/api/reviews/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
 
-    if (!res.ok) throw new Error("Failed to update review");
+      if (!res.ok) {
+        throw new Error("Failed to update review");
+      }
 
-    const data = await res.json();
+      const data = await res.json();
 
-    setReviews(prev =>
-      prev.map(r => (r._id === id ? data : r))
-    );
-  } catch (err) {
-    setError(err.message);
-  }
-};
+      setReviews((prev) =>
+        prev.map((review) => (review._id === id ? data : review))
+      );
+    } catch (err) {
+      console.error("Update review error:", err);
+      setError(err.message);
+    }
+  };
 
   return (
     <div className="container">
@@ -135,18 +175,22 @@ function App() {
         <h2>Filter Reviews</h2>
 
         <div>
-          <select onChange={(e) => setSelectedUser(e.target.value)}>
+          <select
+            value={selectedUser}
+            onChange={(e) => {
+              setSelectedUser(e.target.value);
+              setSelectedMovie("");
+            }}
+          >
             <option value="">Select User</option>
-            {users.map(user => (
+            {users.map((user) => (
               <option key={user._id} value={user._id}>
                 {user.username}
               </option>
             ))}
           </select>
 
-          <button onClick={fetchByUser}>
-            Show User Reviews
-          </button>
+          <button onClick={fetchByUser}>Show User Reviews</button>
 
           <button onClick={hideReviews} className="danger">
             Hide
@@ -156,18 +200,22 @@ function App() {
         <br />
 
         <div>
-          <select onChange={(e) => setSelectedMovie(e.target.value)}>
+          <select
+            value={selectedMovie}
+            onChange={(e) => {
+              setSelectedMovie(e.target.value);
+              setSelectedUser("");
+            }}
+          >
             <option value="">Select Movie</option>
-            {movies.map(movie => (
+            {movies.map((movie) => (
               <option key={movie._id} value={movie._id}>
                 {movie.title}
               </option>
             ))}
           </select>
 
-          <button onClick={fetchByMovie}>
-            Show Movie Reviews
-          </button>
+          <button onClick={fetchByMovie}>Show Movie Reviews</button>
 
           <button onClick={hideReviews} className="danger">
             Hide
@@ -176,7 +224,7 @@ function App() {
       </div>
 
       <div className="section">
-        <ReviewForm onAdd={fetchByUser} />
+        <ReviewForm onAdd={viewMode === "movie" ? fetchByMovie : fetchByUser} />
       </div>
 
       {loading && <p className="loading">Loading...</p>}
@@ -187,7 +235,7 @@ function App() {
           reviews={reviews}
           onDelete={deleteReview}
           onUpdate={updateReview}
-          showActions={viewMode == "user"}
+          showActions={viewMode === "user"}
         />
       )}
     </div>
